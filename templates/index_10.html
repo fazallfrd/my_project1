@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Shipment Report Maker</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top left, #e7f0ff, #cfd8ff, #e8efff);
+            background-size: 200% 200%;
+            animation: bgShift 12s infinite ease-in-out;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes bgShift {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .card-luxury {
+            width: 680px;
+            padding: 40px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.55);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.12);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.35);
+            transition: 0.4s ease;
+        }
+
+        .card-luxury:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 35px 70px rgba(0,0,0,0.18);
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #3a4fa4, #6e85d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            letter-spacing: 0.4px;
+        }
+
+        /* Main action buttons */
+        .btn-premium {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 16px;
+            font-size: 1.06rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffffff, #e9edff);
+            border: 1px solid #c9d2f7;
+            color: #2d3c88;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+            transition: all 0.25s ease;
+        }
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 22px rgba(0,0,0,0.18);
+            background: linear-gradient(135deg, #f7f9ff, #ffffff);
+        }
+        .btn-premium:active {
+            transform: scale(0.97);
+        }
+
+        /* Upload pill container (the big rounded area in your screenshot) */
+        .upload-pill {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 999px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.10);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+        }
+
+        .upload-label-text {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #2f3f8c;
+        }
+
+        /* Custom Choose File button inside the pill */
+        .file-upload-btn {
+            padding: 10px 22px;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffffff, #e9edff);
+            border: 1px solid #c9d2f7;
+            color: #2d3c88;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .file-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.16);
+            background: linear-gradient(135deg, #f7f9ff, #ffffff);
+        }
+        .file-upload-btn:active {
+            transform: scale(0.97);
+        }
+
+        .file-name-text {
+            font-size: 0.95rem;
+            color: #6b7399;
+        }
+
+        /* Hide the native file input so we don't see the black OS button */
+        #file-input {
+            display: none;
+        }
+
+        #output {
+            margin-top: 18px;
+            padding: 14px;
+            background: rgba(255,255,255,0.65);
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            font-family: monospace;
+        }
+
+        #waiting-icon {
+            display: none;
+            margin-top: 22px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-luxury text-center">
+    <h1>Daily Shipment Report Maker</h1>
+
+    <form id="file-form">
+        <!-- Upload pill area -->
+        <div class="mb-4">
+            <div class="upload-pill">
+                <span class="upload-label-text">Choose File</span>
+
+                <button type="button" id="choose-file-button" class="file-upload-btn">
+                    Browse
+                </button>
+
+                <span id="file-name" class="file-name-text">No file chosen</span>
+
+                <!-- Hidden native input -->
+                <input type="file" id="file-input" accept=".xlsx">
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-premium" id="upload-button">Upload</button>
+        <button type="button" class="btn btn-premium" id="refine-button">Refine</button>
+        <button type="button" class="btn btn-premium" id="prepare-button">Prepare</button>
+        <button type="button" class="btn btn-premium" id="download-button" style="display: none;">Download</button>
+    </form>
+
+    <div id="output"></div>
+
+    <div id="waiting-icon">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-2">Processing...</p>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+<script>
+    let uploadedFilePath = '';
+    let downloadFileName = '';
+
+    // Open file dialog when custom button is clicked
+    const fileInput   = document.getElementById('file-input');
+    const chooseBtn   = document.getElementById('choose-file-button');
+    const fileNameEl  = document.getElementById('file-name');
+
+    chooseBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // Show selected file name in the pill
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files && fileInput.files[0]) {
+            fileNameEl.textContent = fileInput.files[0].name;
+        } else {
+            fileNameEl.textContent = 'No file chosen';
+        }
+    });
+
+    function showWaitingIcon() {
+        document.getElementById('waiting-icon').style.display = 'block';
+    }
+
+    function hideWaitingIcon() {
+        document.getElementById('waiting-icon').style.display = 'none';
+    }
+
+    async function postRequest(endpoint, data) {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    }
+
+    async function handleClick(event, endpoint) {
+        showWaitingIcon();
+        let result;
+
+        try {
+            const file = fileInput.files[0];
+
+            if (endpoint === '/upload') {
+                if (!file) throw new Error('No file selected');
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await fetch(endpoint, { method: 'POST', body: formData });
+                const data = await response.json();
+
+                if (!data.path) throw new Error('Upload failed');
+
+                uploadedFilePath = data.path;
+                showOutput(data.message);
+            } else if (uploadedFilePath) {
+                result = await postRequest(endpoint, { file_path: uploadedFilePath });
+                showOutput(result.message);
+
+                if (result.filename) {
+                    downloadFileName = result.filename;
+                    document.getElementById('download-button').style.display = 'block';
+                }
+            } else {
+                throw new Error('No file uploaded yet.');
+            }
+        } catch (err) {
+            showOutput('Error: ' + err.message);
+        } finally {
+            hideWaitingIcon();
+        }
+    }
+
+    function showOutput(msg) {
+        const out = document.getElementById('output');
+        out.textContent = msg;
+        out.style.display = 'block';
+    }
+
+    document.getElementById('upload-button').onclick  = (event) => handleClick(event, '/upload');
+    document.getElementById('refine-button').onclick  = (event) => handleClick(event, '/refine');
+    document.getElementById('prepare-button').onclick = (event) => handleClick(event, '/prepare');
+
+    document.getElementById('download-button').onclick = () => {
+        if (!downloadFileName) return alert('Nothing to download.');
+        window.location.href = `/download/${downloadFileName}`;
+    };
+</script>
+
+</body>
+</html>
